@@ -1,0 +1,20 @@
+.icon {
+    max-width: 30px;
+    max-height: 30px;
+}
+
+.dropdown-toggle::after {
+    display: none;
+}
+
+.edited-text {
+    margin-right: 10px;
+}
+
+.dropdown {
+    margin-left: 10px;
+}
+.card {
+    min-height: 200px;
+    min-width: 450px;
+}
