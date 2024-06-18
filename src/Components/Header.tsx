@@ -19,7 +19,7 @@ const Header = () => {
 
     return (
         <div>
-            <nav className="navbar navbar-expand-lg navbar-light bg-light d-flex justify-content-between">
+            <nav className="navbar navbar-expand-lg navbar-light bg-light d-flex justify-content-between me-2">
                 <div className="d-flex justify-content-center offset-md-2 col-6 col-md-6">
                     <input className="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search"
                            style={{width: '100%'}}/>
@@ -39,11 +39,11 @@ const Header = () => {
                 </div>
             </nav>
             <nav className="navbar navbar-expand-lg navbar-light bg-light justify-content-center">
-                <div className="navbar-nav mt-3 justify-content-center col-12">
-                    <li className={`nav-item col-6 col-md-3 ${activeTab === 'Following' ? 'active' : ''}`}>
+                <div className="navbar-nav mt-3 justify-content-center">
+                    <li className={`nav-item col-12 ${activeTab === 'Following' ? 'active' : ''}`}>
                         <a className="nav-link" href="#" onClick={() => setActiveTab('Following')}>Following</a>
                     </li>
-                    <li className={`nav-item col-6 col-md-3 ${activeTab === 'Recommended' ? 'active' : ''}`}>
+                    <li className={`nav-item col-12 ${activeTab === 'Recommended' ? 'active' : ''}`}>
                         <a className="nav-link" href="#" onClick={() => setActiveTab('Recommended')}>Recommended</a>
                     </li>
                 </div>

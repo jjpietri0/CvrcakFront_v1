@@ -1,42 +1,49 @@
-import React, {useState} from 'react';
+import React from 'react';
 import logo from '../Images/CvrcakLogo.png';
+import {useLocation} from 'react-router-dom';
 import '../CSS/Components.css';
 
 const Sidebar = () => {
-    const [isCollapsed, setIsCollapsed] = useState(false);
-
-    const handleToggle = () => {
-        setIsCollapsed(!isCollapsed);
-    };
+    const location = useLocation();
 
     return (
-        <div className={`sidebar d-flex flex-column flex-shrink-0 p-3 bg-light ${isCollapsed ? 'collapsed' : ''}`}>
+        <div className={`sidebar d-flex flex-column flex-shrink-0 p-3 bg-light : ''}`}>
             {/*<button onClick={handleToggle}>-</button>*/}
-            <div className="d-flex flex-column flex-shrink-0 p-3 bg-light" style={{width: "280px"}}>
-                <a href="/"
-                   className="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-dark text-decoration-none logo-container" id="logoImgLink">
-                    <span className="fs-4"><img src={logo} alt="Logo"/></span>
-                </a>
+            <div className="d-flex flex-column flex-shrink-0 p-3 bg-light " style={{width: "280px"}}>
+                <div>
+                    <a href="/cvrcak"
+                       className="d-flex mb-3 mb-md-0 me-md-auto link-dark text-decoration-none logo-container"
+                       id="logoImgLink">
+                        <span className="fs-4"><img src={logo} alt="Logo"/></span>
+                    </a>
+                </div>
+
                 <hr/>
                 <ul className="nav nav-pills flex-column mb-auto">
-                    <li className="nav-item">
-                        <a href="/" className="nav-link active" aria-current="page">Home page</a>
+                    <li>
+                        <a href="/cvrcak"
+                           className={`nav-link ${location.pathname === '/' ? 'active' : ''}`}>Home page</a>
                     </li>
                     <li>
-                        <a href="/notifications" className="nav-link link-dark">Notifications</a>
+                        <a href="/notifications"
+                           className={`nav-link link-dark ${location.pathname === '/notifications' ? 'active' : ''}`}>Notifications</a>
                     </li>
                     <li>
-                        <a href="/activities" className="nav-link link-dark">Activities</a>
+                        <a href="/activities"
+                           className={`nav-link link-dark ${location.pathname === '/activities' ? 'active' : ''}`}>Activities</a>
                     </li>
                     <li>
-                        <a href="/discussions" className="nav-link link-dark">Discussions</a>
+                        <a href="/discussions"
+                           className={`nav-link link-dark ${location.pathname === '/discussions' ? 'active' : ''}`}>Discussions</a>
                     </li>
                     <li>
-                        <a href="/profile" className="nav-link link-dark">Profile</a>
+                        <a href="/profile"
+                           className={`nav-link link-dark ${location.pathname === '/profile' ? 'active' : ''}`}>Profile</a>
                     </li>
-                    <li>
-                        <a href="/settings" className="nav-link link-dark">Settings</a>
-                    </li>
+                    {/*<li>*/}
+                    {/*    <a href="/settings"*/}
+                    {/*       className={`nav-link link-dark ${location.pathname === '/settings' ? 'active' : ''}`}>Settings</a>*/}
+                    {/*</li>*/}
                 </ul>
                 <hr/>
             </div>

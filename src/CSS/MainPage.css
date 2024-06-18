@@ -1,0 +1,17 @@
+/*.new-post-button {*/
+/*    font-size: 2rem;*/
+/*    width: 70px;*/
+/*    height: 70px;*/
+/*    position: fixed;*/
+/*    left: 20px;*/
+/*    top: 20px;*/
+/*}*/
+.post {
+    max-width: 100%;
+}
+
+@media (max-width: 768px) {
+    .post {
+        max-width: 100%;
+    }
+}

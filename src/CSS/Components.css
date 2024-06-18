@@ -1,9 +1,6 @@
-.sidebar.collapsed {
-    width: 4.5rem;
-}
-.sidebar.collapsed .nav-link {
-    display: none;
-}
+/*.sidebar{*/
+/*    position: fixed;*/
+/*}*/
 
 .logo-container {
     display: flex;
