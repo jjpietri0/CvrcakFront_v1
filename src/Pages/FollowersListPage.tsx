@@ -3,6 +3,18 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Header from '../Components/Header';
 import Sidebar from '../Components/Sidebar';
 import DefaultImage from '../Images/profilePicTemplate.png';
+import {useParams} from "react-router-dom";
+
+function authFetch(url: string, options: RequestInit = {}) {
+    const token = localStorage.getItem('jwtToken');
+
+    options.headers = {
+        ...options.headers,
+        'Authorization': `Bearer ${token}`
+    };
+
+    return fetch(url, options);
+}
 
 interface User {
     userId: number;
@@ -28,9 +40,10 @@ interface User {
 const FollowersList = () => {
     const [followersList, setFollowingList] = useState<User[]>([]);
     const [unfollowStatus] = useState<string | null>(null);
-    //static
+    const {id} = useParams();
+
     useEffect(() => {
-        fetch(`/cvrcak/user/19/followers/1`)
+        authFetch(`/cvrcak/user/${id}/followers/1`)
             .then(response => response.json())
             .then(data => {
                 const updatedData = data.map((user: User) => {
@@ -39,7 +52,7 @@ const FollowersList = () => {
                 setFollowingList(updatedData);
             })
             .catch(error => console.error('Error:', error));
-    }, []);
+    }, [id]);
 
     return (
         <div className="d-flex" id="wrapper">

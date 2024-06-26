@@ -1,9 +1,22 @@
 import React, {useEffect, useState} from 'react';
+import { useParams } from 'react-router-dom';
 import DefaultImage from '../Images/profilePicTemplate.png';
 import '../CSS/ProfileDetails.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import * as bootstrap from 'bootstrap';
 import {Link} from "react-router-dom";
+
+function authFetch(url: string, options: RequestInit = {}) {
+    const token = localStorage.getItem('jwtToken');
+
+    options.headers = {
+        ...options.headers,
+        'Authorization': `Bearer ${token}`
+    };
+
+    return fetch(url, options);
+}
+
 
 interface UserData {
     id: number;
@@ -19,12 +32,14 @@ interface UserData {
 const ProfileDetails = () => {
     const [userData, setUserData] = useState<UserData | null>(null);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const { id } = useParams<{ id: string }>();
+
     useEffect(() => {
-        fetch(`/cvrcak/user/id/20`)
+        authFetch(`/cvrcak/user/id/${id}`)
             .then(response => response.json())
             .then(data => setUserData(data))
             .catch(error => console.error('Error:', error));
-    }, []);
+    }, [id]);
 
     const handleSave = () => {
         const username = (document.getElementById('username') as HTMLInputElement).value;
@@ -35,9 +50,10 @@ const ProfileDetails = () => {
         const birthday = (document.getElementById('birthday') as HTMLInputElement).value;
         const image = (document.getElementById('image') as HTMLInputElement).value;
         const data: any = {
-            userId: "20",
+            userId: userData?.id,
             image: userData?.image
         };
+
 
         if (username) data.username = username;
         if (firstName) data.firstName = firstName;
@@ -47,7 +63,7 @@ const ProfileDetails = () => {
         if (birthday) data.birthday = birthday;
         if (image) data.image = image;
 
-        fetch('/cvrcak/user/update', {
+        authFetch('/cvrcak/user/update', {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -55,6 +71,7 @@ const ProfileDetails = () => {
             body: JSON.stringify(data)
         })
             .then(response => {
+                console.log(data);
                 if (response.ok) {
                     return response.json();
                 } else {
@@ -85,11 +102,9 @@ const ProfileDetails = () => {
                     <hr/>
                     <div className="mb-3">
                         <div className="btn-group p-3 gap-3" role="group">
-                            <Link to={`/user/${userData?.id}/posts`} className="btn btn-secondary">View Posts</Link>
-                            <Link to={`/user/${userData?.id}/following/1`} className="btn btn-secondary">Following
-                                List</Link>
-                            <Link to={`/user/${userData?.id}/followers/1`} className="btn btn-secondary">Followers
-                                List</Link>
+                            <Link to={`/user/${id}/posts`} className="btn btn-secondary">View Posts</Link>
+                            <Link to={`/user/${id}/following/1`} className="btn btn-secondary">Following List</Link>
+                            <Link to={`/user/${id}/followers/1`} className="btn btn-secondary">Followers List</Link>
                         </div>
                     </div>
                     <hr/>

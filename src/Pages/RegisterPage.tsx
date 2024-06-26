@@ -17,7 +17,7 @@ const Register = () => {
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
 
-        const response = await fetch('http://localhost:8080/cvrcak/user/register', {
+        const response = await fetch('http://localhost:8080/cvrcak/auth/register', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

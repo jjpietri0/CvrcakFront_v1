@@ -22,24 +22,28 @@ const Sidebar = () => {
                 <ul className="nav nav-pills flex-column mb-auto">
                     <li>
                         <a href="/cvrcak"
-                           className={`nav-link ${location.pathname === '/' ? 'active' : ''}`}>Home page</a>
+                           className={`nav-link link-dark ${location.pathname === '/' ? 'active' : ''}`}>Home page</a>
                     </li>
                     <li>
-                        <a href="/notifications"
+                        <a href="/cvrcak/notifications"
                            className={`nav-link link-dark ${location.pathname === '/notifications' ? 'active' : ''}`}>Notifications</a>
                     </li>
                     <li>
-                        <a href="/activities"
+                        <a href="/cvrcak/activities"
                            className={`nav-link link-dark ${location.pathname === '/activities' ? 'active' : ''}`}>Activities</a>
                     </li>
                     <li>
-                        <a href="/discussions"
-                           className={`nav-link link-dark ${location.pathname === '/discussions' ? 'active' : ''}`}>Discussions</a>
+                        <a href="/cvrcak/messages"
+                           className={`nav-link link-dark ${location.pathname === '/messages' ? 'active' : ''}`}>Messages</a>
                     </li>
                     <li>
-                        <a href="/profile"
-                           className={`nav-link link-dark ${location.pathname === '/profile' ? 'active' : ''}`}>Profile</a>
+                        <a href="/cvrcak/discussions"
+                           className={`nav-link link-dark ${location.pathname === '/discussions' ? 'active' : ''}`}>Discussions</a>
                     </li>
+                    {/*<li>*/}
+                    {/*    <a href="/cvrcak/profile"*/}
+                    {/*       className={`nav-link link-dark ${location.pathname === '/profile' ? 'active' : ''}`}>Profile</a>*/}
+                    {/*</li>*/}
                     {/*<li>*/}
                     {/*    <a href="/settings"*/}
                     {/*       className={`nav-link link-dark ${location.pathname === '/settings' ? 'active' : ''}`}>Settings</a>*/}

@@ -1,16 +1,37 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import logo from '../Images/CvrcakLogo.png';
+import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const Login = () => {
-    const [email, setEmail] = useState('');
+    const navigate = useNavigate();
+    const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
 
-    const handleSubmit = (event: React.FormEvent) => {
+    const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
-        // Handle login logic here
-        console.log('Email:', email, 'Password:', password);
+
+        const response = await fetch('/cvrcak/auth/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                username: username,
+                password: password,
+            }),
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            localStorage.setItem('jwtToken', data.token);
+            localStorage.setItem('loggedInUsername', username);
+            console.log('Login successful');
+            navigate('/');
+        } else {
+            console.log('Login failed');
+        }
     };
 
     return (
@@ -21,13 +42,13 @@ const Login = () => {
                     <h1>Login</h1>
                 </div>
                 <div className="form-group">
-                    <label htmlFor="email">Email/Username</label>
+                    <label htmlFor="text">Username</label>
                     <input
-                        type="email"
-                        id="email"
+                        type="text"
+                        id="username"
                         className="form-control"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
                         required
                     />
                 </div>
