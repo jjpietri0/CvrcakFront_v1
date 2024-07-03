@@ -8,6 +8,7 @@ const Login = () => {
     const navigate = useNavigate();
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [errorMessage, setErrorMessage] = useState(''); // New state variable for error message
 
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
@@ -30,7 +31,7 @@ const Login = () => {
             console.log('Login successful');
             navigate('/');
         } else {
-            console.log('Login failed');
+            setErrorMessage('Login failed! Please check your username and password.');
         }
     };
 
@@ -41,6 +42,7 @@ const Login = () => {
                     <img src={logo} alt="Cvrcak Logo" className="mb-4" style={{width: '100px', height: '100px', objectFit: 'contain'}} />
                     <h1>Login</h1>
                 </div>
+                {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
                 <div className="form-group">
                     <label htmlFor="text">Username</label>
                     <input

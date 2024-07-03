@@ -129,17 +129,19 @@ const Header = () => {
                 </div>
                 <div className="d-flex justify-content-end mr-2">
                     <div className="dropdown">
-                        <img src={profileImage} alt="Profile" className="dropdown-toggle" id="dropdownMenuButton"
-                             data-bs-toggle="dropdown" aria-expanded="false" onClick={handleProfileClick}/>
+                        <img src={profileImage} alt="Profile" className="dropdown-toggle rounded-circle"
+                             id="dropdownMenuButton"
+                             data-bs-toggle="dropdown" aria-expanded="false" onClick={handleProfileClick}
+                             style={{width: '60px', height: '60px'}}/>
                         {isLoggedIn && (
                             <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
                                 <li>
                                     <a className="dropdown-header pe-1">Logged in as:</a>
-                                   <a className="dropdown-item fw-bold h5">{localStorage.getItem('loggedInUsername')}</a>
+                                    <a className="dropdown-item fw-bold h5">{localStorage.getItem('loggedInUsername')}</a>
                                 </li>
                                 <div className="dropdown-divider"/>
                                 <li>
-                                    <a className="dropdown-item" href="#" onClick={handleProfileLinkClick}>Profile</a>
+                                    <a className="dropdown-item" href="#" onClick={handleProfileLinkClick}> My Profile</a>
                                 </li>
                                 <li>
                                     <button className="dropdown-item" onClick={handleSignOut}>Sign Out</button>

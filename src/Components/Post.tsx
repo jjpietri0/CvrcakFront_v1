@@ -6,6 +6,8 @@ import  commentIcon from '../Images/commentIcon.png';
 import '../CSS/Post.css';
 import {Modal} from "bootstrap";
 import CommentsModal from "./CommentsModal";
+import Comment from './CommentForm';
+import EditPostModal from "./EditPostModal";
 
 
 function authFetch(url: string, options: RequestInit = {}) {
@@ -22,13 +24,16 @@ function authFetch(url: string, options: RequestInit = {}) {
 
 class Post extends React.Component<{ data: any }, {
     username: string,
+    userImage: string,
     modalImage: string,
     modalId: string,
     likesCount: number,
     commentsCount: number,
-    comments: any[]
-    isLoadingComments: boolean
-    remainingTime: number
+    comments: any[],
+    isLoadingComments: boolean,
+    remainingTime: number,
+    hasLiked: boolean
+    isEditModalVisible: boolean
 
 }> {
     timerId: NodeJS.Timeout | null = null;
@@ -37,19 +42,23 @@ class Post extends React.Component<{ data: any }, {
         super(props);
         let remainingTime = Infinity;
         if (props.data.disappearTime) {
-            const disappearDate = new Date(props.data.disappearTime);
+            const [year, month, day, hour, minute] = props.data.disappearTime;
+            const disappearDate = new Date(Date.UTC(year, month - 1, day, hour, minute));
             const now = new Date();
             remainingTime = Math.max(Math.floor((disappearDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)), 0);
         }
         this.state = {
             username: '',
+            userImage: '',
             modalImage: '',
             modalId: `imageModal-${props.data.postId}`,
             likesCount: 0,
             commentsCount: 0,
             comments: [],
             isLoadingComments: false,
-            remainingTime: remainingTime
+            remainingTime: remainingTime,
+            hasLiked: false,
+            isEditModalVisible: false
         };
     }
 
@@ -57,10 +66,9 @@ class Post extends React.Component<{ data: any }, {
 
     componentDidMount() {
         const { data } = this.props;
-        console.log(data.userId);
-        authFetch(`cvrcak/user/id/${data.userId}`)
+        authFetch(`/cvrcak/user/id/${data.userId}`)
             .then(response => response.json())
-            .then(data => this.setState({ username: data.username }))
+            .then(data => this.setState({ username: data.username, userImage: data.image }))
             .catch(error => console.error('Error:', error));
 
         authFetch(`/cvrcak/post/likesCount/${data.postId}`)
@@ -78,7 +86,6 @@ class Post extends React.Component<{ data: any }, {
             }));
         }, 1000 * 60 * 60 * 24);
     }
-
     componentWillUnmount() {
         if (this.timerId) {
             clearInterval(this.timerId);
@@ -91,7 +98,7 @@ class Post extends React.Component<{ data: any }, {
             .then(response => response.json())
             .then(comments => {
                 return Promise.all(comments.map((comment: any) =>
-                    authFetch(`cvrcak/user/id/${comment.userId}`)
+                    authFetch(`/cvrcak/user/id/${comment.userId}`)
                         .then(response => response.json())
                         .then(user => ({...comment, username: user.username}))
                 ));
@@ -124,6 +131,76 @@ class Post extends React.Component<{ data: any }, {
                 console.error('Error:', error);
             });
     };
+    handleLike = () => {
+        const userId = localStorage.getItem('userID');
+        const { data } = this.props;
+
+        const body = {
+            likeId: 0,
+            userId: Number(userId),
+            postId: data.postId
+        };
+
+        authFetch('/cvrcak/like', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(body)
+        })
+            .then(response => {
+                if (response.ok) {
+                    console.log('Post liked');
+                    this.setState({ hasLiked: true });
+                    return authFetch(`/cvrcak/post/likesCount/${data.postId}`);
+                } else {
+                    console.error('Error:', response.statusText);
+                    throw new Error(response.statusText);
+                }
+            })
+            .then(response => response.json())
+            .then(data => this.setState({likesCount: data}))
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    };
+    handleUnlike = () => {
+        const userId = localStorage.getItem('userID');
+        const { data } = this.props;
+
+        const body = {
+            likeId: 0,
+            userId: Number(userId),
+            postId: data.postId
+        };
+
+        authFetch('/cvrcak/unlike', {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(body)
+        })
+            .then(response => {
+                if (response.ok) {
+                    console.log('Post unliked');
+                    this.setState({ hasLiked: false });
+                    return authFetch(`/cvrcak/post/likesCount/${data.postId}`);
+                } else {
+                    console.error('Error:', response.statusText);
+                    throw new Error(response.statusText);
+                }
+            })
+            .then(response => response.json())
+            .then(data => this.setState({likesCount: data}))
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    };
+    toggleEditModal = () => {
+        this.setState(prevState => ({ isEditModalVisible: !prevState.isEditModalVisible }));
+    };
+
 
     render() {
         const currentUserId = localStorage.getItem('userID');
@@ -139,9 +216,10 @@ class Post extends React.Component<{ data: any }, {
                     )}
                     <div className="card-header d-flex justify-content-between">
                         <div>
-                            <img src={logo} alt="User profile" className="rounded-circle me-2"
+                            <img src={this.state.userImage || logo} alt="User profile" className="rounded-circle me-2"
                                  style={{width: "30px", height: "30px"}}/>
-                            <Link to={`/user/${data.userId}`} className="text-decoration-none text-reset fw-bold">{this.state.username}</Link>
+                            <Link to={`/user/${data.userId}`}
+                                  className="text-decoration-none text-reset fw-bold">{this.state.username}</Link>
                             <h6 className="mt-3">{data.title}</h6>
 
                         </div>
@@ -152,10 +230,11 @@ class Post extends React.Component<{ data: any }, {
                                         id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
                                     . . .
                                 </button>
-                                <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
-                                    {data.userId === currentUserId ? (
+                                <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton" >
+                                    {Number(data.userId) === Number(currentUserId) ? (
                                         <>
-                                            <li><a className="dropdown-item" href="#">Edit</a></li>
+                                            <li><a className="dropdown-item" href="#" onClick={this.toggleEditModal}>Edit</a>
+                                            </li>
                                             <li><a className="dropdown-item btn-danger" href="#"
                                                    onClick={this.handleDelete}>Delete</a></li>
                                         </>
@@ -166,6 +245,7 @@ class Post extends React.Component<{ data: any }, {
                                         </>
                                     )}
                                 </ul>
+                                <EditPostModal show={this.state.isEditModalVisible} handleClose={this.toggleEditModal} post={data} />
                             </div>
                         </div>
                     </div>
@@ -193,7 +273,10 @@ class Post extends React.Component<{ data: any }, {
                         <small className="text-muted">Posted
                             on {new Date(data.postingDate).toLocaleDateString()}</small>
                         <div>
-                            <button className="btn btn-link"><img src={likeIcon} alt="Like" className="me-2 icon"/>
+                            <button className="btn btn-link"
+                                    onClick={this.state.hasLiked ? this.handleUnlike : this.handleLike}>
+                                <img src={likeIcon} alt="Like/Unlike"
+                                     className={`me-2 icon ${this.state.hasLiked ? 'text-primary' : 'text-secondary'}`}/>
                             </button>
                             <span>{this.state.likesCount}</span>
                             <button className="btn btn-link" onClick={this.handleCommentClick}><img src={commentIcon}
@@ -203,6 +286,7 @@ class Post extends React.Component<{ data: any }, {
                             <span>{this.state.commentsCount}</span>
                         </div>
                     </div>
+                    <Comment postId={data.postId} />
                     <CommentsModal
                         data={data}
                         username={this.state.username}

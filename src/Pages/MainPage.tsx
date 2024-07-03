@@ -89,6 +89,7 @@ const MainPage = () => {
                         return new Date(b.postingDate).getTime() - new Date(a.postingDate).getTime();
                     });
                     data = data.slice(posts.length, posts.length + 5);
+                    console.log(data);
                     setPosts(posts.concat(data));
                 })
                 .catch(error => {
@@ -123,13 +124,12 @@ const MainPage = () => {
             disappearTime = (document.getElementById('disappearTime') as HTMLInputElement).value;
         }
 
-        // Check if both content and image are empty
         if (!content && !image) {
             alert('Post must have either content or an image');
             return;
         }
 
-        //ovo je data za osobu koja submita post, privremeno dok ne implementiramo login
+        //data for new post
         const data = {
             userId: userID.current,
             title,

@@ -6,6 +6,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import * as bootstrap from 'bootstrap';
 import {Link} from "react-router-dom";
 
+
 function authFetch(url: string, options: RequestInit = {}) {
     const token = localStorage.getItem('jwtToken');
 
@@ -17,9 +18,8 @@ function authFetch(url: string, options: RequestInit = {}) {
     return fetch(url, options);
 }
 
-
 interface UserData {
-    id: number;
+    userId: number;
     image: string | null;
     username: string;
     firstName: string;
@@ -32,14 +32,24 @@ interface UserData {
 const ProfileDetails = () => {
     const [userData, setUserData] = useState<UserData | null>(null);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
-    const { id } = useParams<{ id: string }>();
+    const currentUserId = localStorage.getItem('userID');
+    const { id: idParam } = useParams<{ id: string }>();
+    const id = idParam || '0';
+    const [isFollowing, setIsFollowing] = useState(false);
+
 
     useEffect(() => {
         authFetch(`/cvrcak/user/id/${id}`)
             .then(response => response.json())
             .then(data => setUserData(data))
             .catch(error => console.error('Error:', error));
-    }, [id]);
+        authFetch(`/cvrcak/user/${currentUserId}/following/1`)
+            .then(response => response.json())
+            .then(data => {
+                const isFollowingUser = data.some((user: UserData) => user.userId === parseInt(id));
+                setIsFollowing(isFollowingUser);
+            }).catch(error => console.error('Error:', error));
+    }, [id, currentUserId]);
 
     const handleSave = () => {
         const username = (document.getElementById('username') as HTMLInputElement).value;
@@ -50,7 +60,7 @@ const ProfileDetails = () => {
         const birthday = (document.getElementById('birthday') as HTMLInputElement).value;
         const image = (document.getElementById('image') as HTMLInputElement).value;
         const data: any = {
-            userId: userData?.id,
+            userId: userData?.userId,
             image: userData?.image
         };
 
@@ -93,6 +103,38 @@ const ProfileDetails = () => {
                 modal.hide();
             });
     };
+    const handleUnfollow = () => {
+        authFetch(`/cvrcak/user/${currentUserId}/unfollow/${id}`, {
+            method: 'DELETE'
+        })
+            .then(response => {
+                if (response.ok) {
+                    setIsFollowing(false);
+                    console.log('Unfollow successful');
+                } else {
+                    throw new Error('Unfollow failed');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    };
+    const handleFollow = () => {
+        if (isFollowing) {
+            handleUnfollow();
+        } else {
+            authFetch(`/cvrcak/user/${currentUserId}/follow/${id}`, {
+                method: 'POST'
+            })
+                .then(response => {
+                    if (response.ok) {
+                        setIsFollowing(true);
+                        console.log('Follow successful');
+                    } else {
+                        throw new Error('Follow failed');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+    };
     return (
         <div className="d-flex justify-content-center align-items-center vh-100">
             <div className="card profile-details text-center">
@@ -105,6 +147,11 @@ const ProfileDetails = () => {
                             <Link to={`/user/${id}/posts`} className="btn btn-secondary">View Posts</Link>
                             <Link to={`/user/${id}/following/1`} className="btn btn-secondary">Following List</Link>
                             <Link to={`/user/${id}/followers/1`} className="btn btn-secondary">Followers List</Link>
+                            {currentUserId !== id && (
+                                <button className="btn btn-primary" onClick={handleFollow}>
+                                    {isFollowing ? 'Unfollow' : 'Follow'}
+                                </button>
+                            )}
                         </div>
                     </div>
                     <hr/>
@@ -123,10 +170,19 @@ const ProfileDetails = () => {
                             className="border p-1">{userData.birthday}</span></p>}
                     </div>
                     <hr/>
-                    <button type="button" className="btn btn-primary m-2" data-bs-toggle="modal"
-                            data-bs-target="#editProfileModal">Edit Profile
-                    </button>
-                    <button className="btn btn-danger">Delete Account</button>
+                    {currentUserId !== id ? (
+                        <div className="m-2">
+                            <button className="btn btn-warning m-2">Report</button>
+                            <button className="btn btn-danger">Block</button>
+                        </div>
+                    ) : (
+                        <div>
+                            <button type="button" className="btn btn-primary m-2" data-bs-toggle="modal"
+                                    data-bs-target="#editProfileModal">Edit Profile
+                            </button>
+                            <button className="btn btn-danger">Delete Account</button>
+                        </div>
+                    )}
                 </div>
             </div>
             <div className="modal fade" id="editProfileModal" aria-labelledby="editProfileModalLabel"
@@ -182,6 +238,7 @@ const ProfileDetails = () => {
                             </form>
                             {errorMessage && <div className="alert alert-danger mt-2">{errorMessage}</div>}
                         </div>
+
                         <div className="modal-footer">
                             <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                             <button type="button" className="btn btn-primary" onClick={handleSave}>Save changes</button>
