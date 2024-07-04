@@ -22,7 +22,7 @@ function authFetch(url: string, options: RequestInit = {}) {
 }
 
 
-class Post extends React.Component<{ data: any }, {
+class DiscussionComponent extends React.Component<{ data: any }, {
     username: string,
     userImage: string,
     modalImage: string,
@@ -103,7 +103,12 @@ class Post extends React.Component<{ data: any }, {
                         .then(user => ({...comment, username: user.username}))
                 ));
             })
-            .then(commentsWithUsernames => this.setState({comments: commentsWithUsernames, isLoadingComments: false}))
+            .then(commentsWithUsernames => {
+                const sortedComments = commentsWithUsernames.sort((a: any, b: any) =>
+                    new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+                );
+                this.setState({comments: sortedComments, isLoadingComments: false});
+            })
             .catch(error => {
                 console.error('Error:', error);
                 this.setState({ isLoadingComments: false });
@@ -205,15 +210,15 @@ class Post extends React.Component<{ data: any }, {
     render() {
         const currentUserId = localStorage.getItem('userID');
         let {data} = this.props;
-        if (data.deleteDate != null) {
+        if (data.deleteDate != null || this.state.remainingTime <= 0) {
             return null;
         }
         return (
             <div className="container w-50">
                 <div className="card mt-3">
-                    {/*{data.disappearTime && this.state.remainingTime !== Infinity && (*/}
-                    {/*    <div className="alert alert-danger mb-0" role="alert">Post below will disappear in {this.state.remainingTime} days</div>*/}
-                    {/*)}*/}
+                    {data.disappearTime && this.state.remainingTime !== Infinity && (
+                        <div className="alert alert-danger mb-0" role="alert">Discussion below will disappear in {this.state.remainingTime} days</div>
+                    )}
                     <div className="card-header d-flex justify-content-between">
                         <div>
                             <img src={this.state.userImage || logo} alt="User profile" className="rounded-circle me-2"
@@ -270,7 +275,7 @@ class Post extends React.Component<{ data: any }, {
                         </div>
                     </div>
                     <div className="card-footer d-flex justify-content-between">
-                        <small className="text-muted">Posted
+                        <small className="text-muted">Discussion started
                             on {new Date(data.postingDate).toLocaleDateString()}</small>
                         <div>
                             <button className="btn btn-link"
@@ -303,4 +308,4 @@ class Post extends React.Component<{ data: any }, {
     }
 }
 
-export default Post;
+export default DiscussionComponent;

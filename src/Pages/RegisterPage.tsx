@@ -33,7 +33,7 @@ const Register = () => {
                 password,
                 email,
                 country,
-                gender: genderValue, // Use the converted gender value
+                gender: genderValue,
                 birthday,
                 image
             })

@@ -20,6 +20,7 @@ const Header = () => {
     const [userResults, setUserResults] = useState<User[]>([]);
     const [postResults, setPostResults] = useState<Post[]>([]);
     const [showDropdown, setShowDropdown] = useState(false);
+
     const handleProfileLinkClick = (event: React.MouseEvent) => {
         event.preventDefault();
         navigate(`/user/${localStorage.getItem('userID')}`);
@@ -73,8 +74,13 @@ const Header = () => {
             setShowDropdown(false);
             return;
         }
-        const userResults = await axios.get(`/cvrcak/user/${searchQuery}`);
-        const postResults = await axios.get(`/cvrcak/post/title/${searchQuery}`);
+        const token = localStorage.getItem('jwtToken');
+        const config = {
+            headers: { Authorization: `Bearer ${token}` }
+        };
+
+        const userResults = await axios.get(`/cvrcak/user/${searchQuery}`, config);
+        const postResults = await axios.get(`/cvrcak/post/title/${searchQuery}`, config);
         if (!userResults.data && postResults.data.length === 0) {
             setUserResults([]);
             setPostResults([]);
@@ -111,7 +117,7 @@ const Header = () => {
                     <input className="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search"
                            style={{width: '85%'}} onChange={handleSearchInput} onKeyPress={handleKeyPress}/>
                     {showDropdown && (
-                        <div className="dropdown show position-absolute start-0">
+                        <div className="dropdown show position-absolute">
                             <div className="dropdown-menu show" aria-labelledby="dropdownMenuButton">
                                 {userResults.length > 0 && <h6 className="dropdown-header">Users</h6>}
                                 {userResults.map((user, index) => (

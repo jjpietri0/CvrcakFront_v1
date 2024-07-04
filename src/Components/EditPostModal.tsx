@@ -23,33 +23,40 @@ const EditPostModal: React.FC<EditPostModalProps> = ({ post, show, handleClose }
     }, [show]);
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setEditedPost({
-            ...editedPost,
-            [event.target.name]: event.target.value
-        });
+        const { name, value } = event.target;
+        setEditedPost(prevState => ({
+            ...prevState,
+            [name]: value
+        }));
+        console.log(`Updated ${name}: ${value}`);
     };
 
     const editPost = async (editedPostData: PostData) => {
-        console.log(editedPostData.title + ' ' + editedPostData.content + ' ' + editedPostData.image)
-        const response = await fetch('/cvrcak/post/update', {
-            method: 'PUT',
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('jwtToken')}`,
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                postId: editedPostData.postId,
-                userId: userId,
-                title: editedPostData.title,
-                content: editedPostData.content,
-                image: editedPostData.image,
-            }),
-        });
+        console.log('Sending update request with payload:', editedPostData);
 
-        if (!response.ok) {
-            throw new Error('Failed to update the post');
+        try {
+            const response = await fetch('/cvrcak/post/update', {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('jwtToken')}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    postId: editedPostData.postId,
+                    userId: userId,
+                    title: editedPostData.title,
+                    content: editedPostData.content,
+                    image: editedPostData.image,
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error(`Failed to update the post, status: ${response.status}`);
+            }
+            if (handleClose) handleClose();
+        } catch (error) {
+            console.error('Error updating post:', error);
         }
-        if (handleClose) handleClose();
     };
 
     const handleSubmit = (event: React.FormEvent) => {

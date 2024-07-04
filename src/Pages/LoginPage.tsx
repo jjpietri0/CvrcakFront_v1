@@ -8,7 +8,7 @@ const Login = () => {
     const navigate = useNavigate();
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const [errorMessage, setErrorMessage] = useState(''); // New state variable for error message
+    const [errorMessage, setErrorMessage] = useState('');
 
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();

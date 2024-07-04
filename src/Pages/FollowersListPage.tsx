@@ -3,11 +3,10 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Header from '../Components/Header';
 import Sidebar from '../Components/Sidebar';
 import DefaultImage from '../Images/profilePicTemplate.png';
-import {useParams} from "react-router-dom";
+import {Link, useParams} from "react-router-dom";
 
 function authFetch(url: string, options: RequestInit = {}) {
     const token = localStorage.getItem('jwtToken');
-
     options.headers = {
         ...options.headers,
         'Authorization': `Bearer ${token}`
@@ -68,15 +67,18 @@ const FollowersList = () => {
                                 <div key={user.userId}
                                      className="following-user d-flex align-items-center justify-content-between border rounded m-3">
                                     <div className="d-flex align-items-center m-2">
-                                        <img src={user.image || DefaultImage} alt="User" className="me-3"/>
+                                        <img style={{width: '70px', height: '70px'}} src={user.image || DefaultImage} alt="User" className="me-3 rounded-circle"/>
                                         <div>
-                                            <p className="mb-0 h5 fw-bolder">{user.username}</p>
+                                            <p className="mb-0 h5 fw-bolder">
+                                                <Link className="text-decoration-none text-reset fw-bold"
+                                                      to={`/user/${user.userId}`}>{user.username}</Link>
+                                            </p>
                                             <p className="mb-0"><span className="fw-bold">Date
                                                 followed:</span> {user.registerDate}</p>
                                         </div>
                                     </div>
                                     <div className="dropdown">
-                                        <button className="btn btn-secondary dropdown-toggle" type="button"
+                                        <button className="btn btn-secondary dropdown-toggle m-2" type="button"
                                                 id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
                                             ...
                                         </button>

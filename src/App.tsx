@@ -9,6 +9,8 @@ import FollowersList from "./Pages/FollowersListPage";
 import UserPostsPage from "./Pages/UserPostsPage";
 import MessagesPage from "./Pages/MessagesPage";
 import ProfilePage from "./Pages/ProfilePage";
+import DiscussionsPage from "./Pages/DiscussionsPage";
+import TimelinesPage from "./Pages/TimelinesPage";
 
 const App = () => {
     return (
@@ -23,7 +25,9 @@ const App = () => {
                     <Route path="/user/:id/following/:page" element={<FollowingList/>}/>
                     <Route path="/messages" element={<MessagesPage/>}/>
                     <Route path="/user/:id/followers/:page" element={<FollowersList/>}/>
+                    <Route path="/discussions" element={< DiscussionsPage/>}/>
                     <Route path="/user/:id/posts" element={< UserPostsPage/>}/>
+                    <Route path="/timeline/:id" element={<TimelinesPage/>}/>
                     <Route path="*" element={<h1>Not Found</h1>}/>
                 </Routes>
             </div>

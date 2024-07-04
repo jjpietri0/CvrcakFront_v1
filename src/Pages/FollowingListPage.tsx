@@ -51,7 +51,6 @@ const FollowingList = () => {
             .then(data => {
                 const updatedData = data.map((user: User) => ({...user, isFollowing: true}));
                 setFollowingList(updatedData);
-                console.log(updatedData);
             })
             .catch(error => console.error('Error:', error));
     }, [id]);

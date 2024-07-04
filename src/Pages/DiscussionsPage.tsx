@@ -1,9 +1,7 @@
-import React, { useEffect, useState, useRef } from 'react';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import Header from '../Components/Header';
-import Sidebar from '../Components/Sidebar';
-import Post from "../Components/Post";
-import '../CSS/MainPage.css';
+import Sidebar from "../Components/Sidebar";
+import Header from "../Components/Header";
+import React, {useEffect, useRef, useState} from "react";
+import DiscussionComponent from "../Components/DiscussionComponent";
 import {Modal} from "bootstrap";
 
 
@@ -18,7 +16,7 @@ function authFetch(url: string, options: RequestInit = {}) {
     return fetch(url, options);
 }
 
-const MainPage = () => {
+const DiscussionsPage = () => {
     const loggedInUsername = localStorage.getItem('loggedInUsername');
     const userID = useRef('');
     const [posts, setPosts] = useState([]);
@@ -73,8 +71,8 @@ const MainPage = () => {
     }, [loggedInUsername, activeTab]);
 
     //on scroll load next posts that are not already loaded
-    window.onscroll = function(ev: any) {
-        if (!isLoading && (window.innerHeight + window.scrollY) >= document.body.offsetHeight) { // Modify this line
+    window.onscroll = function() {
+        if (!isLoading && (window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
             setIsLoading(true);
             authFetch('/cvrcak/post/all')
                 .then(response => {
@@ -108,13 +106,15 @@ const MainPage = () => {
         const isPublic = (document.getElementById('isPublic') as HTMLInputElement)?.checked ?? false;
         const isPermanent = (document.getElementById('isPermanent') as HTMLInputElement)?.checked ?? false;
         const isDeleted = false;
+        const disappearTime = (document.getElementById('disappearTime') as HTMLInputElement).value;
+
 
         if (!content && !image) {
             alert('Post must have either content or an image');
             return;
         }
 
-        // Data for new post
+        //data for new post
         const data = {
             userId: userID.current,
             title,
@@ -123,9 +123,10 @@ const MainPage = () => {
             isPublic,
             isPermanent,
             isDeleted,
+            disappearTime
         };
 
-        authFetch('cvrcak/post/newPost', {
+        authFetch('/cvrcak/post/newPost', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -152,13 +153,14 @@ const MainPage = () => {
             });
     };
 
+
+
     return (
         <div className="d-flex" id="wrapper">
             <Sidebar />
             <div id="page-content-wrapper">
                 <Header/>
-
-                <button type="button" className="btn btn-primary rounded-circle new-post-button" data-bs-toggle="modal"
+                <button type="button" className="btn btn-primary rounded-circle new-post-button m-2" data-bs-toggle="modal"
                         data-bs-target="#newPostModal">
                     +
                 </button>
@@ -167,7 +169,7 @@ const MainPage = () => {
                     <div className="modal-dialog">
                         <div className="modal-content">
                             <div className="modal-header">
-                                <h5 className="modal-title" id="newPostModalLabel">New Post</h5>
+                                <h5 className="modal-title" id="newPostModalLabel">New Discussion</h5>
                                 <button type="button" className="btn-close" data-bs-dismiss="modal"
                                         aria-label="Close"></button>
                             </div>
@@ -191,7 +193,7 @@ const MainPage = () => {
                                             <input className="form-check-input" type="checkbox" id="isPublic"/>
                                         </div>
                                     </div>
-                                    <div id="disappearTimeDiv" style={{display: 'none'}}>
+                                    <div id="disappearTimeDiv">
                                         <label htmlFor="disappearTime" className="form-label">Disappear Time</label>
                                         <input type="datetime-local" className="form-control" id="disappearTime"/>
                                     </div>
@@ -206,7 +208,7 @@ const MainPage = () => {
                     </div>
                 </div>
                 {posts.map((post, index) => (
-                    <Post key={index} data={post}/>
+                    <DiscussionComponent key={index} data={post}/>
                 ))}
                 <button className="btn btn-secondary back-to-top rounded-circle"
                         onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})}>
@@ -219,6 +221,6 @@ const MainPage = () => {
             </div>
         </div>
     );
-};
+}
 
-export default MainPage;
+export default DiscussionsPage;
